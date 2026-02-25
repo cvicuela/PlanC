@@ -1,23 +1,14 @@
 {
   "name": "talenthub",
-  "version": "0.0.1",
   "private": true,
-  "workspaces": [
-    "landing",
-    "app",
-    "mobile"
-  ],
+  "workspaces": ["landing", "app"],
   "scripts": {
-    "dev:landing": "npm run dev --workspace=landing",
-    "dev:app": "npm run dev --workspace=app",
-    "dev:mobile": "npm run dev --workspace=mobile",
-    "build:landing": "npm run build --workspace=landing",
-    "build:app": "npm run build --workspace=app",
-    "lint": "npm run lint --workspaces --if-present",
-    "typecheck": "npm run typecheck --workspaces --if-present"
+    "dev:landing": "cd landing && npm run dev",
+    "dev:app": "cd app && npm run dev -- --port 3001",
+    "dev": "concurrently \"npm run dev:landing\" \"npm run dev:app\"",
+    "install:all": "cd landing && npm install && cd ../app && npm install"
   },
-  "engines": {
-    "node": ">=18.0.0",
-    "npm": ">=9.0.0"
+  "devDependencies": {
+    "concurrently": "^8.2.0"
   }
 }
