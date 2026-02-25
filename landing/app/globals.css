@@ -259,6 +259,27 @@
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
+
+  /* TalentHub brand colors */
+  --color-brand-purple: #7C3AED;
+  --color-brand-orange: #F97316;
+  --color-brand-purple-light: #EDE9FE;
+  --color-brand-orange-light: #FFF7ED;
+}
+
+@layer utilities {
+  .bg-gradient-brand {
+    background-image: linear-gradient(to right, #7C3AED, #F97316);
+  }
+  .bg-gradient-brand-br {
+    background-image: linear-gradient(to bottom right, #7C3AED, #6D28D9);
+  }
+  .text-gradient-brand {
+    background-image: linear-gradient(to right, #7C3AED, #F97316);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
 }
 
 /*

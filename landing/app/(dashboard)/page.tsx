@@ -1,130 +1,664 @@
-import { Button } from '@/components/ui/button';
-import { ArrowRight, CreditCard, Database } from 'lucide-react';
-import { Terminal } from './terminal';
+import Link from 'next/link';
+import { Check, ArrowRight, Star } from 'lucide-react';
+import SearchBar from '@/components/landing/search-bar';
+import MetricsSection from '@/components/landing/metrics-counter';
+import WaitlistForm from '@/components/landing/waitlist-form';
+
+// ─── Data ────────────────────────────────────────────────────────────────────
+
+const categories = [
+  {
+    emoji: '🎭',
+    title: 'Talentos & Recursos',
+    description: 'Fotógrafos, músicos, chefs, animadores, técnicos y más',
+    badge: '2,400+ disponibles',
+    href: '#talentos',
+    accent: '#7C3AED',
+    bg: 'bg-purple-50',
+    badgeBg: 'bg-purple-100 text-purple-700',
+  },
+  {
+    emoji: '🏢',
+    title: 'Espacios & Venues',
+    description: 'Salones, rooftops, estudios, canchas, restaurantes y más',
+    badge: '800+ espacios',
+    href: '#espacios',
+    accent: '#F97316',
+    bg: 'bg-orange-50',
+    badgeBg: 'bg-orange-100 text-orange-700',
+  },
+  {
+    emoji: '📣',
+    title: 'Media Center',
+    description: 'Vallas, prensa digital, YouTube, podcasts, radio y más',
+    badge: '150+ medios',
+    href: '#media',
+    accent: '#059669',
+    bg: 'bg-emerald-50',
+    badgeBg: 'bg-emerald-100 text-emerald-700',
+  },
+];
+
+const steps = [
+  {
+    emoji: '🔍',
+    title: 'Busca',
+    description: 'Describe lo que necesitas para tu evento y filtra por categoría, ubicación y precio.',
+  },
+  {
+    emoji: '📊',
+    title: 'Compara',
+    description: 'Ve precios, reviews y disponibilidad en tiempo real de todos los suplidores.',
+  },
+  {
+    emoji: '📅',
+    title: 'Reserva',
+    description: 'Confirma al instante con pago 100% seguro. Sin llamadas ni trámites.',
+  },
+  {
+    emoji: '✅',
+    title: 'Listo',
+    description: 'Disfruta tu evento. Califica y comparte tu experiencia con la comunidad.',
+  },
+];
+
+const testimonials = [
+  {
+    name: 'Ana García',
+    city: 'Santo Domingo',
+    role: 'Organizadora de eventos',
+    quote:
+      'Encontré un fotógrafo profesional en 10 minutos. La calidad fue increíble y el precio, justo. ¡Definitivamente lo volvería a usar!',
+    rating: 5,
+    initials: 'AG',
+    color: 'bg-purple-500',
+  },
+  {
+    name: 'Carlos Martínez',
+    city: 'Santiago',
+    role: 'Dueño de venue',
+    quote:
+      'Renté mi salón todos los fines de semana desde que lo puse en TalentHub. Se convirtió en mi fuente de ingresos principal.',
+    rating: 5,
+    initials: 'CM',
+    color: 'bg-orange-500',
+  },
+  {
+    name: 'María López',
+    city: 'La Romana',
+    role: 'Empresaria',
+    quote:
+      'Llegué a 50,000 personas con una sola campaña en vallas digitales. Nunca pensé que sería tan fácil y accesible hacer marketing.',
+    rating: 5,
+    initials: 'ML',
+    color: 'bg-emerald-500',
+  },
+];
+
+const pricingPlans = [
+  {
+    name: 'Gratis',
+    price: 0,
+    description: 'Para quienes buscan y reservan',
+    features: [
+      'Búsqueda ilimitada',
+      'Reservas instantáneas',
+      'Chat con suplidores',
+      'Pago seguro integrado',
+    ],
+    cta: 'Crear cuenta gratis',
+    href: '/sign-up',
+    featured: false,
+  },
+  {
+    name: 'Suplidor',
+    price: 29,
+    description: 'Para suplidores que inician',
+    features: [
+      'Hasta 3 listings activos',
+      'Analytics básicos',
+      'Perfil verificado',
+      'Soporte por email',
+    ],
+    cta: 'Empezar prueba gratis',
+    href: '/sign-up',
+    featured: true,
+  },
+  {
+    name: 'Pro',
+    price: 79,
+    description: 'Para suplidores que escalan',
+    features: [
+      'Listings ilimitados',
+      'Posición destacada en búsquedas',
+      'Analytics avanzados',
+      'Soporte prioritario 24/7',
+    ],
+    cta: 'Empezar prueba gratis',
+    href: '/sign-up',
+    featured: false,
+  },
+];
+
+// ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default function HomePage() {
   return (
-    <main>
-      <section className="py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="lg:grid lg:grid-cols-12 lg:gap-8">
-            <div className="sm:text-center md:max-w-2xl md:mx-auto lg:col-span-6 lg:text-left">
-              <h1 className="text-4xl font-bold text-gray-900 tracking-tight sm:text-5xl md:text-6xl">
-                Build Your SaaS
-                <span className="block text-orange-500">Faster Than Ever</span>
+    <main className="bg-white">
+      {/* ═══════════════════════════════════════════════════════
+          HERO
+      ═══════════════════════════════════════════════════════ */}
+      <section className="relative overflow-hidden bg-gradient-to-br from-[#5B21B6] via-[#7C3AED] to-[#6D28D9] pt-20 pb-36">
+        {/* Decorative blobs */}
+        <div
+          aria-hidden
+          className="absolute -top-40 -right-40 h-96 w-96 rounded-full bg-[#F97316]/20 blur-3xl"
+        />
+        <div
+          aria-hidden
+          className="absolute bottom-0 -left-20 h-64 w-64 rounded-full bg-white/10 blur-3xl"
+        />
+
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="lg:grid lg:grid-cols-12 lg:gap-12 items-center">
+            {/* Left column */}
+            <div className="lg:col-span-6">
+              {/* Availability badge */}
+              <div className="inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-2 text-sm text-white mb-6 backdrop-blur-sm">
+                <span className="flex h-2 w-2 rounded-full bg-green-400 animate-pulse" />
+                Disponible en Santo Domingo · Santiago · La Romana
+              </div>
+
+              <h1 className="text-4xl font-extrabold text-white tracking-tight sm:text-5xl lg:text-6xl leading-tight">
+                Todo lo que necesitas para tu evento —
+                <span className="text-[#F97316]"> en un solo lugar</span>
               </h1>
-              <p className="mt-3 text-base text-gray-500 sm:mt-5 sm:text-xl lg:text-lg xl:text-xl">
-                Launch your SaaS product in record time with our powerful,
-                ready-to-use template. Packed with modern technologies and
-                essential integrations.
+
+              <p className="mt-6 text-lg text-white/80 leading-relaxed max-w-lg">
+                Talentos, espacios y publicidad. Disponibles ahora mismo, cerca de ti.
               </p>
-              <div className="mt-8 sm:max-w-lg sm:mx-auto sm:text-center lg:text-left lg:mx-0">
-                <a
-                  href="https://vercel.com/templates/next.js/next-js-saas-starter"
-                  target="_blank"
+
+              {/* Search bar (client component) */}
+              <SearchBar />
+
+              {/* Popular searches */}
+              <div className="mt-5 flex flex-wrap items-center gap-2">
+                <span className="text-white/50 text-sm">Popular:</span>
+                {['DJ en Santo Domingo', 'Salón para 100 personas', 'Valla publicitaria'].map(
+                  (tag) => (
+                    <button
+                      key={tag}
+                      className="text-xs bg-white/10 hover:bg-white/20 text-white rounded-full px-3 py-1.5 transition-colors backdrop-blur-sm"
+                    >
+                      {tag}
+                    </button>
+                  )
+                )}
+              </div>
+            </div>
+
+            {/* Right column — stacked mockup cards */}
+            <div className="lg:col-span-6 mt-16 lg:mt-0">
+              <div className="relative h-80 lg:h-96 mx-auto max-w-sm lg:max-w-none">
+                {/* Card 1 — Talent */}
+                <div className="absolute top-0 left-4 lg:left-8 w-64 bg-white rounded-2xl shadow-2xl p-4 transform rotate-2 z-10">
+                  <div className="flex items-center gap-3">
+                    <div className="h-11 w-11 rounded-full bg-purple-100 flex items-center justify-center text-xl flex-shrink-0">
+                      📸
+                    </div>
+                    <div>
+                      <p className="font-semibold text-gray-900 text-sm">Juan Fotografía</p>
+                      <p className="text-xs text-gray-500">Fotografía profesional</p>
+                    </div>
+                  </div>
+                  <div className="mt-3 flex items-center justify-between">
+                    <div className="flex items-center gap-1">
+                      <span className="text-yellow-400 text-xs">★★★★★</span>
+                      <span className="text-xs text-gray-400">4.9 (127 reseñas)</span>
+                    </div>
+                    <span className="text-sm font-bold text-[#7C3AED]">$150/hr</span>
+                  </div>
+                  <div className="mt-3 w-full py-2 bg-[#7C3AED] text-white text-xs font-semibold rounded-lg text-center">
+                    Ver disponibilidad
+                  </div>
+                </div>
+
+                {/* Card 2 — Space */}
+                <div className="absolute top-24 left-12 lg:left-20 w-64 bg-white rounded-2xl shadow-2xl p-4 z-20">
+                  <div className="flex items-center gap-3">
+                    <div className="h-11 w-11 rounded-full bg-orange-100 flex items-center justify-center text-xl flex-shrink-0">
+                      🏛️
+                    </div>
+                    <div>
+                      <p className="font-semibold text-gray-900 text-sm">Salón Gran Ballroom</p>
+                      <p className="text-xs text-gray-500">200 personas · Gazcue</p>
+                    </div>
+                  </div>
+                  <div className="mt-3 flex items-center justify-between">
+                    <div className="flex items-center gap-1">
+                      <span className="text-yellow-400 text-xs">★★★★★</span>
+                      <span className="text-xs text-gray-400">4.8 (84)</span>
+                    </div>
+                    <span className="text-sm font-bold text-[#F97316]">$800/evento</span>
+                  </div>
+                  <div className="mt-3 flex gap-2">
+                    <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full font-medium">
+                      Disponible hoy
+                    </span>
+                    <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full font-medium">
+                      A/C incluido
+                    </span>
+                  </div>
+                </div>
+
+                {/* Card 3 — Media */}
+                <div className="absolute top-48 left-20 lg:left-36 w-64 bg-white rounded-2xl shadow-2xl p-4 transform -rotate-1 z-10">
+                  <div className="flex items-center gap-3">
+                    <div className="h-11 w-11 rounded-full bg-emerald-100 flex items-center justify-center text-xl flex-shrink-0">
+                      📺
+                    </div>
+                    <div>
+                      <p className="font-semibold text-gray-900 text-sm">Valla Av. 27 de Febrero</p>
+                      <p className="text-xs text-gray-500">Santo Domingo Norte</p>
+                    </div>
+                  </div>
+                  <div className="mt-3 flex items-center justify-between">
+                    <span className="text-xs text-gray-500">50K impresiones/sem</span>
+                    <span className="text-sm font-bold text-emerald-600">$2,500/sem</span>
+                  </div>
+                  <div className="mt-3 flex gap-2">
+                    <span className="text-xs bg-purple-100 text-purple-700 px-2 py-1 rounded-full font-medium">
+                      Digital
+                    </span>
+                    <span className="text-xs bg-red-100 text-red-700 px-2 py-1 rounded-full font-medium">
+                      Alta demanda
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ═══════════════════════════════════════════════════════
+          CATEGORÍAS
+      ═══════════════════════════════════════════════════════ */}
+      <section id="talentos" className="py-20 bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-gray-900 sm:text-4xl">
+              ¿Qué necesitas para tu evento?
+            </h2>
+            <p className="mt-4 text-lg text-gray-500">
+              Tres categorías, miles de opciones — todas en un solo lugar
+            </p>
+          </div>
+
+          <div className="grid gap-6 md:grid-cols-3" id="espacios">
+            {categories.map((cat) => (
+              <div
+                key={cat.title}
+                className={`${cat.bg} rounded-3xl p-8 flex flex-col gap-5 group hover:shadow-lg transition-shadow`}
+              >
+                <div
+                  className="text-5xl h-16 w-16 flex items-center justify-center rounded-2xl bg-white shadow-sm"
                 >
-                  <Button
-                    size="lg"
-                    variant="outline"
-                    className="text-lg rounded-full"
+                  {cat.emoji}
+                </div>
+
+                <div className="flex-1">
+                  <div className="flex items-center gap-3 mb-3">
+                    <h3 className="text-xl font-bold text-gray-900">{cat.title}</h3>
+                  </div>
+                  <p className="text-gray-600 leading-relaxed">{cat.description}</p>
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <span className={`text-sm font-semibold px-3 py-1 rounded-full ${cat.badgeBg}`}>
+                    {cat.badge}
+                  </span>
+                  <Link
+                    href={cat.href}
+                    className="flex items-center gap-1 text-sm font-semibold transition-colors"
+                    style={{ color: cat.accent }}
                   >
-                    Deploy your own
-                    <ArrowRight className="ml-2 h-5 w-5" />
-                  </Button>
+                    Explorar <ArrowRight className="h-4 w-4" />
+                  </Link>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ═══════════════════════════════════════════════════════
+          CÓMO FUNCIONA
+      ═══════════════════════════════════════════════════════ */}
+      <section className="py-20 bg-white" id="media">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-14">
+            <h2 className="text-3xl font-bold text-gray-900 sm:text-4xl">¿Cómo funciona?</h2>
+            <p className="mt-4 text-lg text-gray-500">
+              En 4 pasos sencillos, tu evento listo para brillar
+            </p>
+          </div>
+
+          <div className="grid grid-cols-2 gap-8 lg:grid-cols-4">
+            {steps.map((step, i) => (
+              <div key={step.title} className="flex flex-col items-center text-center">
+                {/* Step number */}
+                <div className="relative mb-4">
+                  <div className="h-16 w-16 rounded-full bg-gradient-to-br from-[#7C3AED] to-[#F97316] flex items-center justify-center text-3xl shadow-lg">
+                    {step.emoji}
+                  </div>
+                  <span className="absolute -top-1 -right-1 h-6 w-6 rounded-full bg-white border-2 border-[#7C3AED] flex items-center justify-center text-xs font-bold text-[#7C3AED]">
+                    {i + 1}
+                  </span>
+                </div>
+                <h3 className="text-lg font-bold text-gray-900 mb-2">{step.title}</h3>
+                <p className="text-sm text-gray-500 leading-relaxed">{step.description}</p>
+
+                {/* Connector arrow (desktop only, not on last) */}
+                {i < steps.length - 1 && (
+                  <div className="hidden lg:block absolute" />
+                )}
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-14 text-center">
+            <Link
+              href="/sign-up"
+              className="inline-flex items-center gap-2 px-8 py-4 rounded-full bg-gradient-to-r from-[#7C3AED] to-[#F97316] text-white font-semibold text-lg hover:opacity-90 transition-opacity shadow-lg"
+            >
+              Empieza ahora gratis
+              <ArrowRight className="h-5 w-5" />
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* ═══════════════════════════════════════════════════════
+          MÉTRICAS (client component — animadas al scroll)
+      ═══════════════════════════════════════════════════════ */}
+      <MetricsSection />
+
+      {/* ═══════════════════════════════════════════════════════
+          TESTIMONIOS
+      ═══════════════════════════════════════════════════════ */}
+      <section className="py-20 bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-gray-900 sm:text-4xl">
+              Lo que dicen nuestros usuarios
+            </h2>
+            <p className="mt-4 text-lg text-gray-500">
+              Historias reales de personas que ya confían en TalentHub
+            </p>
+          </div>
+
+          <div className="grid gap-6 md:grid-cols-3">
+            {testimonials.map((t) => (
+              <div
+                key={t.name}
+                className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex flex-col gap-4"
+              >
+                {/* Stars */}
+                <div className="flex gap-0.5">
+                  {Array.from({ length: t.rating }).map((_, i) => (
+                    <Star key={i} className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                  ))}
+                </div>
+
+                {/* Quote */}
+                <p className="text-gray-700 leading-relaxed flex-1">"{t.quote}"</p>
+
+                {/* Author */}
+                <div className="flex items-center gap-3 pt-2 border-t border-gray-50">
+                  <div
+                    className={`h-10 w-10 rounded-full ${t.color} flex items-center justify-center text-white font-bold text-sm flex-shrink-0`}
+                  >
+                    {t.initials}
+                  </div>
+                  <div>
+                    <p className="text-sm font-semibold text-gray-900">{t.name}</p>
+                    <p className="text-xs text-gray-500">
+                      {t.role} · {t.city}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ═══════════════════════════════════════════════════════
+          CTA SUPLIDORES — Waitlist
+      ═══════════════════════════════════════════════════════ */}
+      <section className="py-20 bg-gradient-to-r from-[#7C3AED] to-[#F97316]">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="lg:grid lg:grid-cols-2 lg:gap-16 items-center">
+            <div>
+              <h2 className="text-3xl font-bold text-white sm:text-4xl leading-tight">
+                ¿Tienes talento, espacio o medios?
+                <span className="block mt-1">Empieza a ganar hoy.</span>
+              </h2>
+              <p className="mt-4 text-lg text-white/80">
+                Miles de clientes están buscando exactamente lo que tú ofreces. Únete a la lista de
+                espera y sé de los primeros suplidores en República Dominicana.
+              </p>
+              <ul className="mt-6 space-y-2">
+                {[
+                  'Sin costos de inscripción',
+                  'Pagos seguros y rápidos',
+                  'Soporte dedicado para suplidores',
+                ].map((item) => (
+                  <li key={item} className="flex items-center gap-2 text-white/90 text-sm">
+                    <Check className="h-4 w-4 flex-shrink-0" />
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <div className="mt-10 lg:mt-0">
+              <p className="text-white font-semibold mb-4">
+                Regístrate y te avisamos cuando lancemos:
+              </p>
+              <WaitlistForm />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ═══════════════════════════════════════════════════════
+          PRICING
+      ═══════════════════════════════════════════════════════ */}
+      <section id="precios" className="py-20 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-gray-900 sm:text-4xl">Planes para todos</h2>
+            <p className="mt-4 text-lg text-gray-500">
+              Empieza gratis. Escala cuando estés listo.
+            </p>
+          </div>
+
+          <div className="grid gap-6 md:grid-cols-3 max-w-5xl mx-auto">
+            {pricingPlans.map((plan) => (
+              <div
+                key={plan.name}
+                className={`relative rounded-3xl p-8 flex flex-col gap-6 ${
+                  plan.featured
+                    ? 'bg-gradient-to-br from-[#7C3AED] to-[#6D28D9] text-white shadow-2xl scale-105'
+                    : 'bg-gray-50 border border-gray-200'
+                }`}
+              >
+                {plan.featured && (
+                  <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-[#F97316] text-white text-xs font-bold px-4 py-1 rounded-full">
+                    MÁS POPULAR
+                  </span>
+                )}
+
+                <div>
+                  <h3
+                    className={`text-xl font-bold ${plan.featured ? 'text-white' : 'text-gray-900'}`}
+                  >
+                    {plan.name}
+                  </h3>
+                  <p
+                    className={`text-sm mt-1 ${plan.featured ? 'text-white/70' : 'text-gray-500'}`}
+                  >
+                    {plan.description}
+                  </p>
+                </div>
+
+                <div className="flex items-baseline gap-1">
+                  <span
+                    className={`text-4xl font-extrabold ${plan.featured ? 'text-white' : 'text-gray-900'}`}
+                  >
+                    ${plan.price}
+                  </span>
+                  <span
+                    className={`text-sm ${plan.featured ? 'text-white/60' : 'text-gray-400'}`}
+                  >
+                    /mes
+                  </span>
+                </div>
+
+                <ul className="space-y-3 flex-1">
+                  {plan.features.map((f) => (
+                    <li key={f} className="flex items-start gap-2">
+                      <Check
+                        className={`h-4 w-4 mt-0.5 flex-shrink-0 ${plan.featured ? 'text-[#F97316]' : 'text-[#7C3AED]'}`}
+                      />
+                      <span
+                        className={`text-sm ${plan.featured ? 'text-white/90' : 'text-gray-700'}`}
+                      >
+                        {f}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+
+                <Link
+                  href={plan.href}
+                  className={`block text-center py-3 px-6 rounded-xl font-semibold text-sm transition-all ${
+                    plan.featured
+                      ? 'bg-white text-[#7C3AED] hover:bg-white/90'
+                      : 'bg-gradient-to-r from-[#7C3AED] to-[#F97316] text-white hover:opacity-90'
+                  }`}
+                >
+                  {plan.cta}
+                </Link>
+              </div>
+            ))}
+          </div>
+
+          <p className="text-center mt-8 text-sm text-gray-400">
+            Todos los planes incluyen 14 días de prueba gratis. Sin tarjeta de crédito.
+          </p>
+        </div>
+      </section>
+
+      {/* ═══════════════════════════════════════════════════════
+          FOOTER
+      ═══════════════════════════════════════════════════════ */}
+      <footer id="contacto" className="bg-gray-900 text-gray-400 py-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-4 mb-12">
+            {/* Brand */}
+            <div>
+              <div className="flex items-center gap-2 mb-4">
+                <div className="flex items-center justify-center h-8 w-8 rounded-lg bg-gradient-to-br from-[#7C3AED] to-[#F97316]">
+                  <span className="text-white text-sm font-bold">⚡</span>
+                </div>
+                <span className="text-white font-bold text-lg">TalentHub</span>
+              </div>
+              <p className="text-sm leading-relaxed">
+                Encuentra el talento, el espacio y la visibilidad que necesitas — ahora mismo.
+              </p>
+              <div className="mt-5 flex gap-4">
+                <a
+                  href="#"
+                  className="hover:text-white transition-colors text-sm"
+                  aria-label="Instagram"
+                >
+                  Instagram
+                </a>
+                <a
+                  href="#"
+                  className="hover:text-white transition-colors text-sm"
+                  aria-label="LinkedIn"
+                >
+                  LinkedIn
+                </a>
+                <a
+                  href="#"
+                  className="hover:text-white transition-colors text-sm"
+                  aria-label="WhatsApp"
+                >
+                  WhatsApp
                 </a>
               </div>
             </div>
-            <div className="mt-12 relative sm:max-w-lg sm:mx-auto lg:mt-0 lg:max-w-none lg:mx-0 lg:col-span-6 lg:flex lg:items-center">
-              <Terminal />
-            </div>
-          </div>
-        </div>
-      </section>
 
-      <section className="py-16 bg-white w-full">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="lg:grid lg:grid-cols-3 lg:gap-8">
+            {/* Plataforma */}
             <div>
-              <div className="flex items-center justify-center h-12 w-12 rounded-md bg-orange-500 text-white">
-                <svg viewBox="0 0 24 24" className="h-6 w-6">
-                  <path
-                    fill="currentColor"
-                    d="M14.23 12.004a2.236 2.236 0 0 1-2.235 2.236 2.236 2.236 0 0 1-2.236-2.236 2.236 2.236 0 0 1 2.235-2.236 2.236 2.236 0 0 1 2.236 2.236zm2.648-10.69c-1.346 0-3.107.96-4.888 2.622-1.78-1.653-3.542-2.602-4.887-2.602-.41 0-.783.093-1.106.278-1.375.793-1.683 3.264-.973 6.365C1.98 8.917 0 10.42 0 12.004c0 1.59 1.99 3.097 5.043 4.03-.704 3.113-.39 5.588.988 6.38.32.187.69.275 1.102.275 1.345 0 3.107-.96 4.888-2.624 1.78 1.654 3.542 2.603 4.887 2.603.41 0 .783-.09 1.106-.275 1.374-.792 1.683-3.263.973-6.365C22.02 15.096 24 13.59 24 12.004c0-1.59-1.99-3.097-5.043-4.032.704-3.11.39-5.587-.988-6.38-.318-.184-.688-.277-1.092-.278zm-.005 1.09v.006c.225 0 .406.044.558.127.666.382.955 1.835.73 3.704-.054.46-.142.945-.25 1.44-.96-.236-2.006-.417-3.107-.534-.66-.905-1.345-1.727-2.035-2.447 1.592-1.48 3.087-2.292 4.105-2.295zm-9.77.02c1.012 0 2.514.808 4.11 2.28-.686.72-1.37 1.537-2.02 2.442-1.107.117-2.154.298-3.113.538-.112-.49-.195-.964-.254-1.42-.23-1.868.054-3.32.714-3.707.19-.09.4-.127.563-.132zm4.882 3.05c.455.468.91.992 1.36 1.564-.44-.02-.89-.034-1.345-.034-.46 0-.915.01-1.36.034.44-.572.895-1.096 1.345-1.565zM12 8.1c.74 0 1.477.034 2.202.093.406.582.802 1.203 1.183 1.86.372.64.71 1.29 1.018 1.946-.308.655-.646 1.31-1.013 1.95-.38.66-.773 1.288-1.18 1.87-.728.063-1.466.098-2.21.098-.74 0-1.477-.035-2.202-.093-.406-.582-.802-1.204-1.183-1.86-.372-.64-.71-1.29-1.018-1.946.303-.657.646-1.313 1.013-1.954.38-.66.773-1.286 1.18-1.868.728-.064 1.466-.098 2.21-.098zm-3.635.254c-.24.377-.48.763-.704 1.16-.225.39-.435.782-.635 1.174-.265-.656-.49-1.31-.676-1.947.64-.15 1.315-.283 2.015-.386zm7.26 0c.695.103 1.365.23 2.006.387-.18.632-.405 1.282-.66 1.933-.2-.39-.41-.783-.64-1.174-.225-.392-.465-.774-.705-1.146zm3.063.675c.484.15.944.317 1.375.498 1.732.74 2.852 1.708 2.852 2.476-.005.768-1.125 1.74-2.857 2.475-.42.18-.88.342-1.355.493-.28-.958-.646-1.956-1.1-2.98.45-1.017.81-2.01 1.085-2.964zm-13.395.004c.278.96.645 1.957 1.1 2.98-.45 1.017-.812 2.01-1.086 2.964-.484-.15-.944-.318-1.37-.5-1.732-.737-2.852-1.706-2.852-2.474 0-.768 1.12-1.742 2.852-2.476.42-.18.88-.342 1.356-.494zm11.678 4.28c.265.657.49 1.312.676 1.948-.64.157-1.316.29-2.016.39.24-.375.48-.762.705-1.158.225-.39.435-.788.636-1.18zm-9.945.02c.2.392.41.783.64 1.175.23.39.465.772.705 1.143-.695-.102-1.365-.23-2.006-.386.18-.63.406-1.282.66-1.933zM17.92 16.32c.112.493.2.968.254 1.423.23 1.868-.054 3.32-.714 3.708-.147.09-.338.128-.563.128-1.012 0-2.514-.807-4.11-2.28.686-.72 1.37-1.536 2.02-2.44 1.107-.118 2.154-.3 3.113-.54zm-11.83.01c.96.234 2.006.415 3.107.532.66.905 1.345 1.727 2.035 2.446-1.595 1.483-3.092 2.295-4.11 2.295-.22-.005-.406-.05-.553-.132-.666-.38-.955-1.834-.73-3.703.054-.46.142-.944.25-1.438zm4.56.64c.44.02.89.034 1.345.034.46 0 .915-.01 1.36-.034-.44.572-.895 1.095-1.345 1.565-.455-.47-.91-.993-1.36-1.565z"
-                  />
-                </svg>
-              </div>
-              <div className="mt-5">
-                <h2 className="text-lg font-medium text-gray-900">
-                  Next.js and React
-                </h2>
-                <p className="mt-2 text-base text-gray-500">
-                  Leverage the power of modern web technologies for optimal
-                  performance and developer experience.
-                </p>
-              </div>
+              <h4 className="text-white font-semibold mb-4 text-sm uppercase tracking-wider">
+                Plataforma
+              </h4>
+              <ul className="space-y-2 text-sm">
+                {['Talentos', 'Espacios', 'Media', 'Precios'].map((item) => (
+                  <li key={item}>
+                    <Link href="#" className="hover:text-white transition-colors">
+                      {item}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
             </div>
 
-            <div className="mt-10 lg:mt-0">
-              <div className="flex items-center justify-center h-12 w-12 rounded-md bg-orange-500 text-white">
-                <Database className="h-6 w-6" />
-              </div>
-              <div className="mt-5">
-                <h2 className="text-lg font-medium text-gray-900">
-                  Postgres and Drizzle ORM
-                </h2>
-                <p className="mt-2 text-base text-gray-500">
-                  Robust database solution with an intuitive ORM for efficient
-                  data management and scalability.
-                </p>
-              </div>
-            </div>
-
-            <div className="mt-10 lg:mt-0">
-              <div className="flex items-center justify-center h-12 w-12 rounded-md bg-orange-500 text-white">
-                <CreditCard className="h-6 w-6" />
-              </div>
-              <div className="mt-5">
-                <h2 className="text-lg font-medium text-gray-900">
-                  Stripe Integration
-                </h2>
-                <p className="mt-2 text-base text-gray-500">
-                  Seamless payment processing and subscription management with
-                  industry-leading Stripe integration.
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section className="py-16 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="lg:grid lg:grid-cols-2 lg:gap-8 lg:items-center">
+            {/* Empresa */}
             <div>
-              <h2 className="text-3xl font-bold text-gray-900 sm:text-4xl">
-                Ready to launch your SaaS?
-              </h2>
-              <p className="mt-3 max-w-3xl text-lg text-gray-500">
-                Our template provides everything you need to get your SaaS up
-                and running quickly. Don't waste time on boilerplate - focus on
-                what makes your product unique.
-              </p>
+              <h4 className="text-white font-semibold mb-4 text-sm uppercase tracking-wider">
+                Empresa
+              </h4>
+              <ul className="space-y-2 text-sm">
+                {['Sobre nosotros', 'Blog', 'Prensa', 'Contacto'].map((item) => (
+                  <li key={item}>
+                    <Link href="#" className="hover:text-white transition-colors">
+                      {item}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
             </div>
-            <div className="mt-8 lg:mt-0 flex justify-center lg:justify-end">
-              <a href="https://github.com/nextjs/saas-starter" target="_blank">
-                <Button
-                  size="lg"
-                  variant="outline"
-                  className="text-lg rounded-full"
-                >
-                  View the code
-                  <ArrowRight className="ml-3 h-6 w-6" />
-                </Button>
-              </a>
+
+            {/* Legal */}
+            <div>
+              <h4 className="text-white font-semibold mb-4 text-sm uppercase tracking-wider">
+                Legal
+              </h4>
+              <ul className="space-y-2 text-sm">
+                {['Términos de uso', 'Política de privacidad', 'Cookies'].map((item) => (
+                  <li key={item}>
+                    <Link href="#" className="hover:text-white transition-colors">
+                      {item}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
             </div>
           </div>
+
+          <div className="border-t border-gray-800 pt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <p className="text-sm">© 2025 TalentHub. República Dominicana. Todos los derechos reservados.</p>
+            <p className="text-xs text-gray-600">Hecho con ❤️ en Santo Domingo</p>
+          </div>
         </div>
-      </section>
+      </footer>
     </main>
   );
 }

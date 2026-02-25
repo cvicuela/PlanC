@@ -5,8 +5,9 @@ import { getUser, getTeamForUser } from '@/lib/db/queries';
 import { SWRConfig } from 'swr';
 
 export const metadata: Metadata = {
-  title: 'Next.js SaaS Starter',
-  description: 'Get started quickly with Next.js, Postgres, and Stripe.'
+  title: 'TalentHub — Encuentra el talento, el espacio y la visibilidad que necesitas',
+  description:
+    'Talentos, espacios y publicidad disponibles ahora mismo, cerca de ti. La plataforma líder en República Dominicana.'
 };
 
 export const viewport: Viewport = {
@@ -22,7 +23,7 @@ export default function RootLayout({
 }) {
   return (
     <html
-      lang="en"
+      lang="es"
       className={`bg-white dark:bg-gray-950 text-black dark:text-white ${manrope.className}`}
     >
       <body className="min-h-[100dvh] bg-gray-50">

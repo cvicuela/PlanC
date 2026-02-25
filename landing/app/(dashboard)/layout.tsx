@@ -1,14 +1,14 @@
 'use client';
 
 import Link from 'next/link';
-import { use, useState, Suspense } from 'react';
+import { useState, Suspense } from 'react';
 import { Button } from '@/components/ui/button';
-import { CircleIcon, Home, LogOut } from 'lucide-react';
+import { Zap, Home, LogOut, Menu, X } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuTrigger
+  DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { signOut } from '@/app/(login)/actions';
@@ -17,6 +17,14 @@ import { User } from '@/lib/db/schema';
 import useSWR, { mutate } from 'swr';
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
+
+const navLinks = [
+  { href: '#talentos', label: 'Talentos' },
+  { href: '#espacios', label: 'Espacios' },
+  { href: '#media', label: 'Media' },
+  { href: '/pricing', label: 'Precios' },
+  { href: '#contacto', label: 'Contacto' },
+];
 
 function UserMenu() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -32,14 +40,14 @@ function UserMenu() {
   if (!user) {
     return (
       <>
-        <Link
-          href="/pricing"
-          className="text-sm font-medium text-gray-700 hover:text-gray-900"
+        <Button asChild variant="outline" className="rounded-full border-[#7C3AED] text-[#7C3AED] hover:bg-[#7C3AED]/5">
+          <Link href="/sign-up">Soy Suplidor</Link>
+        </Button>
+        <Button
+          asChild
+          className="rounded-full text-white border-0 bg-gradient-to-r from-[#7C3AED] to-[#F97316] hover:opacity-90 transition-opacity"
         >
-          Pricing
-        </Link>
-        <Button asChild className="rounded-full">
-          <Link href="/sign-up">Sign Up</Link>
+          <Link href="/sign-up">Empieza Gratis</Link>
         </Button>
       </>
     );
@@ -50,11 +58,13 @@ function UserMenu() {
       <DropdownMenuTrigger>
         <Avatar className="cursor-pointer size-9">
           <AvatarImage alt={user.name || ''} />
-          <AvatarFallback>
-            {user.email
+          <AvatarFallback className="bg-[#7C3AED] text-white">
+            {(user.name || user.email)
               .split(' ')
               .map((n) => n[0])
-              .join('')}
+              .join('')
+              .toUpperCase()
+              .slice(0, 2)}
           </AvatarFallback>
         </Avatar>
       </DropdownMenuTrigger>
@@ -69,7 +79,7 @@ function UserMenu() {
           <button type="submit" className="flex w-full">
             <DropdownMenuItem className="w-full flex-1 cursor-pointer">
               <LogOut className="mr-2 h-4 w-4" />
-              <span>Sign out</span>
+              <span>Cerrar sesión</span>
             </DropdownMenuItem>
           </button>
         </form>
@@ -79,19 +89,75 @@ function UserMenu() {
 }
 
 function Header() {
+  const [mobileOpen, setMobileOpen] = useState(false);
+
   return (
-    <header className="border-b border-gray-200">
+    <header className="border-b border-gray-100 bg-white/90 backdrop-blur-sm sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
-        <Link href="/" className="flex items-center">
-          <CircleIcon className="h-6 w-6 text-orange-500" />
-          <span className="ml-2 text-xl font-semibold text-gray-900">ACME</span>
+        {/* Logo */}
+        <Link href="/" className="flex items-center gap-2 flex-shrink-0">
+          <div className="flex items-center justify-center h-8 w-8 rounded-lg bg-gradient-to-br from-[#7C3AED] to-[#F97316]">
+            <Zap className="h-4 w-4 text-white" />
+          </div>
+          <span className="text-xl font-bold text-gray-900">TalentHub</span>
         </Link>
-        <div className="flex items-center space-x-4">
-          <Suspense fallback={<div className="h-9" />}>
+
+        {/* Desktop nav */}
+        <nav className="hidden md:flex items-center gap-6">
+          {navLinks.map((link) => (
+            <Link
+              key={link.href}
+              href={link.href}
+              className="text-sm font-medium text-gray-600 hover:text-[#7C3AED] transition-colors"
+            >
+              {link.label}
+            </Link>
+          ))}
+        </nav>
+
+        {/* Desktop CTAs */}
+        <div className="hidden md:flex items-center gap-3">
+          <Suspense fallback={<div className="h-9 w-40" />}>
             <UserMenu />
           </Suspense>
         </div>
+
+        {/* Mobile toggle */}
+        <button
+          className="md:hidden p-2 text-gray-600 hover:text-gray-900"
+          onClick={() => setMobileOpen(!mobileOpen)}
+          aria-label="Menú"
+        >
+          {mobileOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+        </button>
       </div>
+
+      {/* Mobile menu */}
+      {mobileOpen && (
+        <div className="md:hidden border-t border-gray-100 bg-white px-4 py-4 space-y-3">
+          {navLinks.map((link) => (
+            <Link
+              key={link.href}
+              href={link.href}
+              className="block py-2 text-sm font-medium text-gray-700 hover:text-[#7C3AED]"
+              onClick={() => setMobileOpen(false)}
+            >
+              {link.label}
+            </Link>
+          ))}
+          <div className="flex flex-col gap-2 pt-2 border-t border-gray-100">
+            <Button asChild variant="outline" className="w-full border-[#7C3AED] text-[#7C3AED]">
+              <Link href="/sign-up">Soy Suplidor</Link>
+            </Button>
+            <Button
+              asChild
+              className="w-full text-white border-0 bg-gradient-to-r from-[#7C3AED] to-[#F97316]"
+            >
+              <Link href="/sign-up">Empieza Gratis</Link>
+            </Button>
+          </div>
+        </div>
+      )}
     </header>
   );
 }

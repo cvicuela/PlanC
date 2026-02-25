@@ -128,6 +128,16 @@ export type TeamDataWithMembers = Team & {
   })[];
 };
 
+export const waitlist = pgTable('waitlist', {
+  id: serial('id').primaryKey(),
+  email: varchar('email', { length: 255 }).notNull().unique(),
+  source: varchar('source', { length: 50 }).default('landing'),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+});
+
+export type WaitlistEntry = typeof waitlist.$inferSelect;
+export type NewWaitlistEntry = typeof waitlist.$inferInsert;
+
 export enum ActivityType {
   SIGN_UP = 'SIGN_UP',
   SIGN_IN = 'SIGN_IN',
