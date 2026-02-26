@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { notFound, useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
@@ -11,8 +11,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Calendar,
-  Clock,
-  User,
+  X,
   ArrowLeft
 } from 'lucide-react';
 import { listings, CATEGORY_BADGE, CATEGORY_EMOJI, CATEGORY_LABELS } from '@/lib/mock-data';
@@ -25,9 +24,35 @@ export default function ListingDetailPage({ params }: { params: { id: string } }
 
   const router = useRouter();
   const [currentImg, setCurrentImg] = useState(0);
+  const [showFullscreen, setShowFullscreen] = useState(false);
+  const touchStartX = useRef(0);
+  const touchEndX = useRef(0);
 
   const prev = () => setCurrentImg((i) => (i - 1 + listing.images.length) % listing.images.length);
   const next = () => setCurrentImg((i) => (i + 1) % listing.images.length);
+
+  const handleTouchStart = useCallback((e: React.TouchEvent) => {
+    touchStartX.current = e.touches[0].clientX;
+  }, []);
+
+  const handleTouchEnd = useCallback((e: React.TouchEvent) => {
+    touchEndX.current = e.changedTouches[0].clientX;
+    const diff = touchStartX.current - touchEndX.current;
+    if (Math.abs(diff) > 50) {
+      if (diff > 0) next();
+      else prev();
+    }
+  }, [listing.images.length]);
+
+  // Lock body scroll when fullscreen gallery is open
+  useEffect(() => {
+    if (showFullscreen) {
+      document.body.classList.add('modal-open');
+    } else {
+      document.body.classList.remove('modal-open');
+    }
+    return () => document.body.classList.remove('modal-open');
+  }, [showFullscreen]);
 
   return (
     <div className="max-w-5xl mx-auto pb-32 md:pb-10">
@@ -45,24 +70,30 @@ export default function ListingDetailPage({ params }: { params: { id: string } }
       <div className="flex flex-col lg:flex-row gap-6 px-4">
         {/* ── Left column ── */}
         <div className="flex-1 min-w-0">
-          {/* Photo carousel */}
-          <div className="relative rounded-2xl overflow-hidden bg-gray-200 aspect-[4/3] md:aspect-[16/9]">
+          {/* Photo carousel — swipeable on mobile, tap to fullscreen */}
+          <div
+            className="relative rounded-2xl overflow-hidden bg-gray-200 aspect-[4/3] md:aspect-[16/9] cursor-pointer"
+            onTouchStart={handleTouchStart}
+            onTouchEnd={handleTouchEnd}
+            onClick={() => setShowFullscreen(true)}
+          >
             <img
               src={listing.images[currentImg]}
               alt={listing.name}
               className="w-full h-full object-cover"
+              draggable={false}
             />
             {listing.images.length > 1 && (
               <>
                 <button
-                  onClick={prev}
-                  className="absolute left-3 top-1/2 -translate-y-1/2 bg-white/80 backdrop-blur-sm rounded-full p-2 shadow hover:bg-white transition-colors"
+                  onClick={(e) => { e.stopPropagation(); prev(); }}
+                  className="absolute left-3 top-1/2 -translate-y-1/2 bg-white/80 backdrop-blur-sm rounded-full p-2 shadow hover:bg-white transition-colors hidden md:block"
                 >
                   <ChevronLeft className="h-5 w-5 text-gray-700" />
                 </button>
                 <button
-                  onClick={next}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 bg-white/80 backdrop-blur-sm rounded-full p-2 shadow hover:bg-white transition-colors"
+                  onClick={(e) => { e.stopPropagation(); next(); }}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 bg-white/80 backdrop-blur-sm rounded-full p-2 shadow hover:bg-white transition-colors hidden md:block"
                 >
                   <ChevronRight className="h-5 w-5 text-gray-700" />
                 </button>
@@ -70,14 +101,62 @@ export default function ListingDetailPage({ params }: { params: { id: string } }
                   {listing.images.map((_, i) => (
                     <button
                       key={i}
-                      onClick={() => setCurrentImg(i)}
+                      onClick={(e) => { e.stopPropagation(); setCurrentImg(i); }}
                       className={`h-1.5 rounded-full transition-all ${i === currentImg ? 'w-5 bg-white' : 'w-1.5 bg-white/60'}`}
                     />
                   ))}
                 </div>
+                {/* Mobile: photo count badge */}
+                <div className="md:hidden absolute top-3 right-3 bg-black/50 backdrop-blur-sm text-white text-xs font-medium px-2.5 py-1 rounded-full">
+                  {currentImg + 1}/{listing.images.length}
+                </div>
               </>
             )}
           </div>
+
+          {/* ── Fullscreen photo gallery overlay (mobile) ── */}
+          {showFullscreen && (
+            <div className="fixed inset-0 z-[9999] bg-black flex flex-col photo-overlay">
+              <div className="flex items-center justify-between px-4 py-3 safe-pt">
+                <button
+                  onClick={() => setShowFullscreen(false)}
+                  className="text-white p-1"
+                >
+                  <X className="h-6 w-6" />
+                </button>
+                <span className="text-white text-sm font-medium">
+                  {currentImg + 1} / {listing.images.length}
+                </span>
+                <div className="w-8" />
+              </div>
+              <div
+                className="flex-1 flex items-center justify-center overflow-hidden"
+                onTouchStart={handleTouchStart}
+                onTouchEnd={handleTouchEnd}
+              >
+                <img
+                  src={listing.images[currentImg]}
+                  alt={listing.name}
+                  className="max-w-full max-h-full object-contain"
+                  draggable={false}
+                />
+              </div>
+              {/* Thumbnail strip */}
+              <div className="flex gap-2 px-4 py-3 overflow-x-auto scrollbar-hide safe-pb">
+                {listing.images.map((img, i) => (
+                  <button
+                    key={i}
+                    onClick={() => setCurrentImg(i)}
+                    className={`flex-shrink-0 w-14 h-14 rounded-lg overflow-hidden border-2 transition-all ${
+                      i === currentImg ? 'border-white' : 'border-transparent opacity-50'
+                    }`}
+                  >
+                    <img src={img} alt="" className="w-full h-full object-cover" />
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
 
           {/* Title & meta */}
           <div className="mt-5">
@@ -104,22 +183,6 @@ export default function ListingDetailPage({ params }: { params: { id: string } }
                 {listing.location.sector}, {listing.location.city}
               </div>
             </div>
-          </div>
-
-          {/* Price (mobile) */}
-          <div className="mt-4 p-4 bg-gray-50 rounded-xl border border-gray-200 lg:hidden">
-            <p className="text-sm text-gray-500">Precio</p>
-            <p className="text-3xl font-bold text-gray-900 mt-0.5">
-              DOP {listing.price.toLocaleString()}
-              <span className="text-base font-normal text-gray-400 ml-1">/{listing.priceUnit}</span>
-            </p>
-            <Link
-              href={`/booking/${listing.id}`}
-              className="block mt-3 w-full text-center py-3 rounded-xl font-semibold text-white transition-opacity hover:opacity-90"
-              style={{ background: 'linear-gradient(to right, #7C3AED, #F97316)' }}
-            >
-              Reservar ahora
-            </Link>
           </div>
 
           {/* Description */}
@@ -222,11 +285,11 @@ export default function ListingDetailPage({ params }: { params: { id: string } }
         </div>
       </div>
 
-      {/* ── Mobile sticky footer ── */}
-      <div className="lg:hidden fixed bottom-16 md:bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-4 py-3 z-40">
+      {/* ── Mobile sticky footer — "Reservar — DOP $X,XXX/hora" ── */}
+      <div className="lg:hidden fixed bottom-[var(--bottom-nav-h)] md:bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-gray-200 px-4 py-3 z-40">
         <div className="flex items-center justify-between gap-3">
           <div>
-            <p className="text-xl font-bold text-gray-900">
+            <p className="text-lg font-bold text-gray-900">
               DOP {listing.price.toLocaleString()}
               <span className="text-sm font-normal text-gray-400 ml-1">/{listing.priceUnit}</span>
             </p>
@@ -237,10 +300,10 @@ export default function ListingDetailPage({ params }: { params: { id: string } }
           </div>
           <Link
             href={`/booking/${listing.id}`}
-            className="flex-1 max-w-[180px] text-center py-3 rounded-xl font-semibold text-white transition-opacity hover:opacity-90"
+            className="flex-shrink-0 text-center px-5 py-3 rounded-xl font-semibold text-white text-sm transition-opacity hover:opacity-90 active:scale-95 transition-transform"
             style={{ background: 'linear-gradient(to right, #7C3AED, #F97316)' }}
           >
-            Reservar ahora
+            Reservar — DOP ${listing.price.toLocaleString()}/{listing.priceUnit}
           </Link>
         </div>
       </div>

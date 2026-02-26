@@ -1,9 +1,10 @@
 'use client';
 
-import { useState, useMemo } from 'react';
-import { Search, MapPin, SlidersHorizontal, X, List, Map } from 'lucide-react';
+import { useState, useMemo, useCallback } from 'react';
+import { Search, MapPin, SlidersHorizontal, X, List, Map, Locate, ChevronDown } from 'lucide-react';
 import dynamic from 'next/dynamic';
-import { listings, Listing } from '@/lib/mock-data';
+import Link from 'next/link';
+import { listings, Listing, CATEGORY_BADGE, CATEGORY_EMOJI } from '@/lib/mock-data';
 import ListingCard from '@/components/listings/ListingCard';
 
 const MapView = dynamic(() => import('@/components/map/MapClient'), { ssr: false });
@@ -24,8 +25,14 @@ export default function ExplorePage() {
   const [location, setLocation] = useState('');
   const [maxPrice, setMaxPrice] = useState('');
   const [minRating, setMinRating] = useState('0');
-  const [viewMode, setViewMode] = useState<ViewMode>('list');
+  // Mobile defaults to map view
+  const [viewMode, setViewMode] = useState<ViewMode>('map');
   const [showFilters, setShowFilters] = useState(false);
+  const [selectedListing, setSelectedListing] = useState<Listing | null>(null);
+  const [showBottomSheet, setShowBottomSheet] = useState(false);
+  const [locatingUser, setLocatingUser] = useState(false);
+  const [userLocation, setUserLocation] = useState<[number, number] | null>(null);
+  const [mapCenter, setMapCenter] = useState<[number, number]>([18.4861, -69.9312]);
 
   const filtered = useMemo<Listing[]>(() => {
     return listings.filter((l) => {
@@ -37,6 +44,26 @@ export default function ExplorePage() {
       return true;
     });
   }, [category, query, location, maxPrice, minRating]);
+
+  const handleLocateUser = useCallback(() => {
+    if (!navigator.geolocation) return;
+    setLocatingUser(true);
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const loc: [number, number] = [pos.coords.latitude, pos.coords.longitude];
+        setUserLocation(loc);
+        setMapCenter(loc);
+        setLocatingUser(false);
+      },
+      () => setLocatingUser(false),
+      { enableHighAccuracy: true, timeout: 10000 }
+    );
+  }, []);
+
+  const handleSelectListing = useCallback((listing: Listing) => {
+    setSelectedListing(listing);
+    setShowBottomSheet(true);
+  }, []);
 
   return (
     <div className="flex flex-col h-full">
@@ -134,17 +161,8 @@ export default function ExplorePage() {
         )}
       </div>
 
-      {/* ── Mobile view toggle ── */}
+      {/* ── Mobile view toggle (hidden on desktop) ── */}
       <div className="md:hidden flex border-b border-gray-200 bg-white flex-shrink-0">
-        <button
-          onClick={() => setViewMode('list')}
-          className={`flex-1 flex items-center justify-center gap-2 py-2.5 text-sm font-medium border-b-2 transition-colors ${
-            viewMode === 'list' ? 'border-[#7C3AED] text-[#7C3AED]' : 'border-transparent text-gray-500'
-          }`}
-        >
-          <List className="h-4 w-4" />
-          Lista ({filtered.length})
-        </button>
         <button
           onClick={() => setViewMode('map')}
           className={`flex-1 flex items-center justify-center gap-2 py-2.5 text-sm font-medium border-b-2 transition-colors ${
@@ -154,13 +172,22 @@ export default function ExplorePage() {
           <Map className="h-4 w-4" />
           Mapa
         </button>
+        <button
+          onClick={() => { setViewMode('list'); setShowBottomSheet(false); }}
+          className={`flex-1 flex items-center justify-center gap-2 py-2.5 text-sm font-medium border-b-2 transition-colors ${
+            viewMode === 'list' ? 'border-[#7C3AED] text-[#7C3AED]' : 'border-transparent text-gray-500'
+          }`}
+        >
+          <List className="h-4 w-4" />
+          Lista ({filtered.length})
+        </button>
       </div>
 
       {/* ── Main content: list + map ── */}
-      <div className="flex-1 flex overflow-hidden">
+      <div className="flex-1 flex overflow-hidden relative">
         {/* List — 60% desktop, full on mobile when in list mode */}
         <div
-          className={`${viewMode === 'map' ? 'hidden' : 'flex'} md:flex flex-col w-full md:w-[60%] overflow-y-auto`}
+          className={`${viewMode === 'map' ? 'hidden' : 'flex'} md:flex flex-col w-full md:w-[60%] overflow-y-auto touch-scroll`}
         >
           {/* Result count */}
           <div className="px-4 py-2.5 bg-gray-50 border-b border-gray-200">
@@ -202,10 +229,87 @@ export default function ExplorePage() {
             ))}
           </div>
 
+          {/* Mobile: Locate me button */}
+          <button
+            onClick={handleLocateUser}
+            disabled={locatingUser}
+            className="md:hidden absolute bottom-[calc(var(--bottom-nav-h)+1rem)] right-3 z-[1000] flex items-center gap-2 bg-white rounded-xl shadow-lg border border-gray-200 px-3 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 active:scale-95 transition-all disabled:opacity-50"
+          >
+            <Locate className={`h-4 w-4 text-[#7C3AED] ${locatingUser ? 'animate-pulse' : ''}`} />
+            {locatingUser ? 'Buscando...' : 'Mi ubicación'}
+          </button>
+
+          {/* Mobile: FAB to switch views */}
+          <button
+            onClick={() => { setViewMode(viewMode === 'map' ? 'list' : 'map'); setShowBottomSheet(false); }}
+            className="md:hidden absolute bottom-[calc(var(--bottom-nav-h)+4rem)] right-3 z-[1000] flex items-center gap-2 text-white rounded-xl shadow-lg px-4 py-3 text-sm font-semibold active:scale-95 transition-transform"
+            style={{ background: 'linear-gradient(135deg, #7C3AED, #F97316)' }}
+          >
+            {viewMode === 'map' ? (
+              <>
+                <List className="h-4 w-4" />
+                Ver lista
+              </>
+            ) : (
+              <>
+                <Map className="h-4 w-4" />
+                Ver mapa
+              </>
+            )}
+          </button>
+
           <div className="flex-1">
-            <MapView listings={filtered} center={[18.4861, -69.9312]} zoom={13} />
+            <MapView listings={filtered} center={mapCenter} zoom={13} />
           </div>
         </div>
+
+        {/* ── Mobile Bottom Sheet (selected listing) ── */}
+        {showBottomSheet && selectedListing && viewMode === 'map' && (
+          <div className="md:hidden fixed bottom-[var(--bottom-nav-h)] left-0 right-0 z-[1001] bg-white rounded-t-2xl shadow-2xl border-t border-gray-200 max-h-[60vh] overflow-hidden flex flex-col">
+            {/* Drag handle */}
+            <div className="flex justify-center py-2 flex-shrink-0">
+              <div className="w-10 h-1 bg-gray-300 rounded-full" />
+            </div>
+            <button
+              onClick={() => setShowBottomSheet(false)}
+              className="absolute top-2 right-3 text-gray-400 hover:text-gray-600 p-1"
+            >
+              <X className="h-5 w-5" />
+            </button>
+            <div className="p-4 overflow-y-auto touch-scroll">
+              <div className="flex gap-3">
+                <img
+                  src={selectedListing.images[0]}
+                  alt={selectedListing.name}
+                  className="w-24 h-24 rounded-xl object-cover flex-shrink-0"
+                />
+                <div className="flex-1 min-w-0">
+                  <span className={`inline-block text-xs font-medium px-2 py-0.5 rounded-full ${CATEGORY_BADGE[selectedListing.category]}`}>
+                    {CATEGORY_EMOJI[selectedListing.category]} {selectedListing.subcategory}
+                  </span>
+                  <h3 className="mt-1 text-sm font-semibold text-gray-900 truncate">{selectedListing.name}</h3>
+                  <p className="text-xs text-gray-500 mt-0.5 flex items-center gap-1">
+                    <MapPin className="h-3 w-3" />
+                    {selectedListing.location.sector}
+                  </p>
+                  <div className="mt-1 flex items-center justify-between">
+                    <p className="text-sm font-bold text-gray-900">
+                      DOP {selectedListing.price.toLocaleString()}
+                      <span className="text-xs font-normal text-gray-400">/{selectedListing.priceUnit}</span>
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <Link
+                href={`/explore/${selectedListing.id}`}
+                className="mt-3 block w-full text-center py-2.5 rounded-xl text-white font-semibold text-sm transition-opacity hover:opacity-90"
+                style={{ background: 'linear-gradient(to right, #7C3AED, #F97316)' }}
+              >
+                Ver detalle
+              </Link>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
