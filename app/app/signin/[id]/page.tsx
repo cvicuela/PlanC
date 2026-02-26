@@ -1,4 +1,3 @@
-import Logo from '@/components/icons/Logo';
 import { createClient } from '@/utils/supabase/server';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
@@ -16,6 +15,7 @@ import OauthSignIn from '@/components/ui/AuthForms/OauthSignIn';
 import ForgotPassword from '@/components/ui/AuthForms/ForgotPassword';
 import UpdatePassword from '@/components/ui/AuthForms/UpdatePassword';
 import SignUp from '@/components/ui/AuthForms/Signup';
+import { Zap } from 'lucide-react';
 
 export default async function SignIn({
   params,
@@ -28,54 +28,52 @@ export default async function SignIn({
   const viewTypes = getViewTypes();
   const redirectMethod = getRedirectMethod();
 
-  // Declare 'viewProp' and initialize with the default value
   let viewProp: string;
 
-  // Assign url id to 'viewProp' if it's a valid string and ViewTypes includes it
   if (typeof params.id === 'string' && viewTypes.includes(params.id)) {
     viewProp = params.id;
   } else {
-    const preferredSignInView =
-      cookies().get('preferredSignInView')?.value || null;
+    const preferredSignInView = cookies().get('preferredSignInView')?.value || null;
     viewProp = getDefaultSignInView(preferredSignInView);
     return redirect(`/signin/${viewProp}`);
   }
 
-  // Check if the user is already logged in and redirect to the account page if so
   const supabase = createClient();
-
   const {
     data: { user }
   } = await supabase.auth.getUser();
 
   if (user && viewProp !== 'update_password') {
-    return redirect('/');
+    const role = user.user_metadata?.role ?? 'user';
+    return redirect(role === 'supplier' ? '/supplier/dashboard' : '/explore');
   } else if (!user && viewProp === 'update_password') {
     return redirect('/signin');
   }
 
+  const cardTitle =
+    viewProp === 'forgot_password'
+      ? 'Restablecer contraseña'
+      : viewProp === 'update_password'
+        ? 'Nueva contraseña'
+        : viewProp === 'signup'
+          ? 'Crea tu cuenta'
+          : 'Entra a TalentHub';
+
   return (
     <div className="flex justify-center height-screen-helper">
-      <div className="flex flex-col justify-between max-w-lg p-3 m-auto w-80 ">
-        <div className="flex justify-center pb-12 ">
-          <Logo width="64px" height="64px" />
+      <div className="flex flex-col justify-between max-w-lg p-3 m-auto w-80">
+        <div className="flex justify-center pb-12">
+          <div
+            className="h-14 w-14 rounded-2xl flex items-center justify-center shadow-lg"
+            style={{ background: 'linear-gradient(135deg, #7C3AED, #F97316)' }}
+          >
+            <Zap className="h-7 w-7 text-white" />
+          </div>
         </div>
-        <Card
-          title={
-            viewProp === 'forgot_password'
-              ? 'Reset Password'
-              : viewProp === 'update_password'
-                ? 'Update Password'
-                : viewProp === 'signup'
-                  ? 'Sign Up'
-                  : 'Sign In'
-          }
-        >
+
+        <Card title={cardTitle}>
           {viewProp === 'password_signin' && (
-            <PasswordSignIn
-              allowEmail={allowEmail}
-              redirectMethod={redirectMethod}
-            />
+            <PasswordSignIn allowEmail={allowEmail} redirectMethod={redirectMethod} />
           )}
           {viewProp === 'email_signin' && (
             <EmailSignIn
@@ -97,14 +95,12 @@ export default async function SignIn({
           {viewProp === 'signup' && (
             <SignUp allowEmail={allowEmail} redirectMethod={redirectMethod} />
           )}
-          {viewProp !== 'update_password' &&
-            viewProp !== 'signup' &&
-            allowOauth && (
-              <>
-                <Separator text="Third-party sign-in" />
-                <OauthSignIn />
-              </>
-            )}
+          {viewProp !== 'update_password' && viewProp !== 'signup' && allowOauth && (
+            <>
+              <Separator text="O continúa con" />
+              <OauthSignIn />
+            </>
+          )}
         </Card>
       </div>
     </div>

@@ -17,6 +17,16 @@ module.exports = {
       }
     },
     extend: {
+      colors: {
+        brand: {
+          purple: '#7C3AED',
+          'purple-dark': '#6D28D9',
+          'purple-light': '#EDE9FE',
+          orange: '#F97316',
+          'orange-dark': '#EA6C0A',
+          'orange-light': '#FFF7ED'
+        }
+      },
       fontFamily: {
         sans: ['var(--font-sans)', ...fontFamily.sans]
       },

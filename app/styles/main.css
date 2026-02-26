@@ -2,6 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
+
 *,
 *:before,
 *:after {
@@ -56,4 +57,28 @@ p a {
 
 .height-screen-helper {
   min-height: calc(100vh - 80px);
+}
+
+/* TalentHub brand gradient */
+.bg-brand-gradient {
+  background: linear-gradient(135deg, #7C3AED, #F97316);
+}
+
+/* Dashboard light mode overrides */
+.dashboard-root {
+  color-scheme: light;
+}
+
+/* Leaflet popup style reset */
+.leaflet-popup-content-wrapper {
+  border-radius: 12px !important;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.15) !important;
+}
+.leaflet-popup-content {
+  margin: 12px 16px !important;
+}
+
+/* Star fill */
+.star-fill {
+  color: #FBBF24;
 }

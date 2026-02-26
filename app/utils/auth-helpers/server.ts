@@ -151,7 +151,9 @@ export async function signInWithPassword(formData: FormData) {
     );
   } else if (data.user) {
     cookieStore.set('preferredSignInView', 'password_signin', { path: '/' });
-    redirectPath = getStatusRedirect('/', 'Success!', 'You are now signed in.');
+    const role = data.user.user_metadata?.role ?? 'user';
+    const dest = role === 'supplier' ? '/supplier/dashboard' : '/explore';
+    redirectPath = getStatusRedirect(dest, '¡Bienvenido!', 'Has iniciado sesión.');
   } else {
     redirectPath = getErrorRedirect(
       '/signin/password_signin',
@@ -178,12 +180,16 @@ export async function signUp(formData: FormData) {
     );
   }
 
+  const role = String(formData.get('role') ?? 'user').trim() || 'user';
+  const destination = role === 'supplier' ? '/supplier/dashboard' : '/explore';
+
   const supabase = createClient();
   const { error, data } = await supabase.auth.signUp({
     email,
     password,
     options: {
-      emailRedirectTo: callbackURL
+      emailRedirectTo: callbackURL,
+      data: { role }
     }
   });
 
@@ -194,7 +200,7 @@ export async function signUp(formData: FormData) {
       error.message
     );
   } else if (data.session) {
-    redirectPath = getStatusRedirect('/', 'Success!', 'You are now signed in.');
+    redirectPath = getStatusRedirect(destination, '¡Bienvenido!', 'Tu cuenta ha sido creada.');
   } else if (
     data.user &&
     data.user.identities &&
