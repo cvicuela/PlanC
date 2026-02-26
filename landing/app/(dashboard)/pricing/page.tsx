@@ -5,7 +5,7 @@ import { SubmitButton } from './submit-button';
 import Link from 'next/link';
 
 // Prices are fresh for one hour max
-export const revalidate = 3600;
+export const dynamic = 'force-dynamic';
 
 export default async function PricingPage() {
   const [prices, products] = await Promise.all([
