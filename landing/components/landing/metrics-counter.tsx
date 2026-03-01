@@ -75,11 +75,18 @@ function MetricCard({ metric }: { metric: Metric }) {
           observer.disconnect();
         }
       },
-      { threshold: 0.3 }
+      { threshold: 0.1, rootMargin: '0px 0px -10% 0px' }
     );
 
     observer.observe(el);
-    return () => observer.disconnect();
+
+    // Fallback: if still not started after 3 s (SSR or Observer not firing), start anyway
+    const fallback = setTimeout(() => setStarted(true), 3000);
+
+    return () => {
+      observer.disconnect();
+      clearTimeout(fallback);
+    };
   }, []);
 
   return (

@@ -148,64 +148,58 @@ export default function HomePage() {
       {/* ═══════════════════════════════════════════════════════
           HERO
       ═══════════════════════════════════════════════════════ */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-[#5B21B6] via-[#7C3AED] to-[#6D28D9] pt-20 pb-36">
+      <section className="relative overflow-hidden bg-gradient-to-br from-[#5B21B6] via-[#7C3AED] to-[#6D28D9] pt-20 pb-16 lg:pb-36">
         {/* Decorative blobs */}
-        <div
-          aria-hidden
-          className="absolute -top-40 -right-40 h-96 w-96 rounded-full bg-[#F97316]/20 blur-3xl"
-        />
-        <div
-          aria-hidden
-          className="absolute bottom-0 -left-20 h-64 w-64 rounded-full bg-white/10 blur-3xl"
-        />
+        <div aria-hidden className="absolute -top-40 -right-40 h-96 w-96 rounded-full bg-[#F97316]/20 blur-3xl" />
+        <div aria-hidden className="absolute bottom-0 -left-20 h-64 w-64 rounded-full bg-white/10 blur-3xl" />
 
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Desktop grid: left text | right stacked cards */}
           <div className="lg:grid lg:grid-cols-12 lg:gap-12 items-center">
-            {/* Left column */}
+
+            {/* ── Left column: text + CTA (always visible) ── */}
             <div className="lg:col-span-6">
               {/* Availability badge */}
-              <div className="inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-2 text-sm text-white mb-6 backdrop-blur-sm">
-                <span className="flex h-2 w-2 rounded-full bg-green-400 animate-pulse" />
-                Disponible en Santo Domingo · Santiago · La Romana
+              <div className="inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-2 text-sm text-white mb-6 backdrop-blur-sm max-w-full">
+                <span className="flex h-2 w-2 shrink-0 rounded-full bg-green-400 animate-pulse" />
+                <span className="truncate text-xs sm:text-sm">Disponible en Santo Domingo · Santiago · La Romana</span>
               </div>
 
-              <h1 className="text-4xl font-extrabold text-white tracking-tight sm:text-5xl lg:text-6xl leading-tight">
-                Todo lo que necesitas para tu evento —
-                <span className="text-[#F97316]"> en un solo lugar</span>
+              {/* Headline — fits 375px without horizontal scroll */}
+              <h1 className="text-[1.75rem] leading-snug font-extrabold text-white tracking-tight sm:text-5xl lg:text-6xl lg:leading-tight">
+                Todo lo que necesitas para tu evento{' '}
+                <span className="inline">—{' '}</span>
+                <span className="text-[#F97316]">en un solo lugar</span>
               </h1>
 
-              <p className="mt-6 text-lg text-white/80 leading-relaxed max-w-lg">
+              <p className="mt-5 text-base text-white/80 leading-relaxed sm:text-lg max-w-lg">
                 Talentos, espacios y publicidad. Disponibles ahora mismo, cerca de ti.
               </p>
 
-              {/* Search bar (client component) */}
+              {/* Search bar */}
               <SearchBar />
 
               {/* Popular searches */}
               <div className="mt-5 flex flex-wrap items-center gap-2">
                 <span className="text-white/50 text-sm">Popular:</span>
-                {['DJ en Santo Domingo', 'Salón para 100 personas', 'Valla publicitaria'].map(
-                  (tag) => (
-                    <button
-                      key={tag}
-                      className="text-xs bg-white/10 hover:bg-white/20 text-white rounded-full px-3 py-1.5 transition-colors backdrop-blur-sm"
-                    >
-                      {tag}
-                    </button>
-                  )
-                )}
+                {['DJ en Santo Domingo', 'Salón para 100 personas', 'Valla publicitaria'].map((tag) => (
+                  <button
+                    key={tag}
+                    className="text-xs bg-white/10 hover:bg-white/20 text-white rounded-full px-3 py-1.5 transition-colors backdrop-blur-sm"
+                  >
+                    {tag}
+                  </button>
+                ))}
               </div>
             </div>
 
-            {/* Right column — stacked mockup cards */}
-            <div className="lg:col-span-6 mt-16 lg:mt-0">
-              <div className="relative h-80 lg:h-96 mx-auto max-w-sm lg:max-w-none">
+            {/* ── Right column: stacked cards — desktop only (lg+) ── */}
+            <div className="hidden lg:block lg:col-span-6">
+              <div className="relative h-96">
                 {/* Card 1 — Talent */}
-                <div className="absolute top-0 left-4 lg:left-8 w-64 bg-white rounded-2xl shadow-2xl p-4 transform rotate-2 z-10">
+                <div className="absolute top-0 left-8 w-64 bg-white rounded-2xl shadow-2xl p-4 transform rotate-2 z-10">
                   <div className="flex items-center gap-3">
-                    <div className="h-11 w-11 rounded-full bg-purple-100 flex items-center justify-center text-xl flex-shrink-0">
-                      📸
-                    </div>
+                    <div className="h-11 w-11 rounded-full bg-purple-100 flex items-center justify-center text-xl shrink-0">📸</div>
                     <div>
                       <p className="font-semibold text-gray-900 text-sm">Juan Fotografía</p>
                       <p className="text-xs text-gray-500">Fotografía profesional</p>
@@ -224,11 +218,9 @@ export default function HomePage() {
                 </div>
 
                 {/* Card 2 — Space */}
-                <div className="absolute top-24 left-12 lg:left-20 w-64 bg-white rounded-2xl shadow-2xl p-4 z-20">
+                <div className="absolute top-24 left-20 w-64 bg-white rounded-2xl shadow-2xl p-4 z-20">
                   <div className="flex items-center gap-3">
-                    <div className="h-11 w-11 rounded-full bg-orange-100 flex items-center justify-center text-xl flex-shrink-0">
-                      🏛️
-                    </div>
+                    <div className="h-11 w-11 rounded-full bg-orange-100 flex items-center justify-center text-xl shrink-0">🏛️</div>
                     <div>
                       <p className="font-semibold text-gray-900 text-sm">Salón Gran Ballroom</p>
                       <p className="text-xs text-gray-500">200 personas · Gazcue</p>
@@ -242,21 +234,15 @@ export default function HomePage() {
                     <span className="text-sm font-bold text-[#F97316]">$800/evento</span>
                   </div>
                   <div className="mt-3 flex gap-2">
-                    <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full font-medium">
-                      Disponible hoy
-                    </span>
-                    <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full font-medium">
-                      A/C incluido
-                    </span>
+                    <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full font-medium">Disponible hoy</span>
+                    <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full font-medium">A/C incluido</span>
                   </div>
                 </div>
 
                 {/* Card 3 — Media */}
-                <div className="absolute top-48 left-20 lg:left-36 w-64 bg-white rounded-2xl shadow-2xl p-4 transform -rotate-1 z-10">
+                <div className="absolute top-48 left-36 w-64 bg-white rounded-2xl shadow-2xl p-4 transform -rotate-1 z-10">
                   <div className="flex items-center gap-3">
-                    <div className="h-11 w-11 rounded-full bg-emerald-100 flex items-center justify-center text-xl flex-shrink-0">
-                      📺
-                    </div>
+                    <div className="h-11 w-11 rounded-full bg-emerald-100 flex items-center justify-center text-xl shrink-0">📺</div>
                     <div>
                       <p className="font-semibold text-gray-900 text-sm">Valla Av. 27 de Febrero</p>
                       <p className="text-xs text-gray-500">Santo Domingo Norte</p>
@@ -267,14 +253,71 @@ export default function HomePage() {
                     <span className="text-sm font-bold text-emerald-600">$2,500/sem</span>
                   </div>
                   <div className="mt-3 flex gap-2">
-                    <span className="text-xs bg-purple-100 text-purple-700 px-2 py-1 rounded-full font-medium">
-                      Digital
-                    </span>
-                    <span className="text-xs bg-red-100 text-red-700 px-2 py-1 rounded-full font-medium">
-                      Alta demanda
-                    </span>
+                    <span className="text-xs bg-purple-100 text-purple-700 px-2 py-1 rounded-full font-medium">Digital</span>
+                    <span className="text-xs bg-red-100 text-red-700 px-2 py-1 rounded-full font-medium">Alta demanda</span>
                   </div>
                 </div>
+              </div>
+            </div>
+          </div>
+
+          {/* ── Tablet: horizontal scrollable cards (sm → md, hidden on mobile & desktop) ── */}
+          <div className="hidden sm:flex lg:hidden gap-4 overflow-x-auto pb-2 mt-8 snap-x snap-mandatory -mx-4 px-4">
+            {/* Card 1 */}
+            <div className="snap-start shrink-0 w-60 bg-white rounded-2xl shadow-xl p-4">
+              <div className="flex items-center gap-3">
+                <div className="h-11 w-11 rounded-full bg-purple-100 flex items-center justify-center text-xl shrink-0">📸</div>
+                <div>
+                  <p className="font-semibold text-gray-900 text-sm">Juan Fotografía</p>
+                  <p className="text-xs text-gray-500">Fotografía profesional</p>
+                </div>
+              </div>
+              <div className="mt-3 flex items-center justify-between">
+                <div className="flex items-center gap-1">
+                  <span className="text-yellow-400 text-xs">★★★★★</span>
+                  <span className="text-xs text-gray-400">4.9</span>
+                </div>
+                <span className="text-sm font-bold text-[#7C3AED]">$150/hr</span>
+              </div>
+              <div className="mt-3 w-full py-2 bg-[#7C3AED] text-white text-xs font-semibold rounded-lg text-center">Ver disponibilidad</div>
+            </div>
+            {/* Card 2 */}
+            <div className="snap-start shrink-0 w-60 bg-white rounded-2xl shadow-xl p-4">
+              <div className="flex items-center gap-3">
+                <div className="h-11 w-11 rounded-full bg-orange-100 flex items-center justify-center text-xl shrink-0">🏛️</div>
+                <div>
+                  <p className="font-semibold text-gray-900 text-sm">Salón Gran Ballroom</p>
+                  <p className="text-xs text-gray-500">200 personas · Gazcue</p>
+                </div>
+              </div>
+              <div className="mt-3 flex items-center justify-between">
+                <div className="flex items-center gap-1">
+                  <span className="text-yellow-400 text-xs">★★★★★</span>
+                  <span className="text-xs text-gray-400">4.8</span>
+                </div>
+                <span className="text-sm font-bold text-[#F97316]">$800/evento</span>
+              </div>
+              <div className="mt-3 flex gap-2">
+                <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full font-medium">Disponible hoy</span>
+                <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full font-medium">A/C incluido</span>
+              </div>
+            </div>
+            {/* Card 3 */}
+            <div className="snap-start shrink-0 w-60 bg-white rounded-2xl shadow-xl p-4">
+              <div className="flex items-center gap-3">
+                <div className="h-11 w-11 rounded-full bg-emerald-100 flex items-center justify-center text-xl shrink-0">📺</div>
+                <div>
+                  <p className="font-semibold text-gray-900 text-sm">Valla Av. 27 de Febrero</p>
+                  <p className="text-xs text-gray-500">Santo Domingo Norte</p>
+                </div>
+              </div>
+              <div className="mt-3 flex items-center justify-between">
+                <span className="text-xs text-gray-500">50K impresiones/sem</span>
+                <span className="text-sm font-bold text-emerald-600">$2,500/sem</span>
+              </div>
+              <div className="mt-3 flex gap-2">
+                <span className="text-xs bg-purple-100 text-purple-700 px-2 py-1 rounded-full font-medium">Digital</span>
+                <span className="text-xs bg-red-100 text-red-700 px-2 py-1 rounded-full font-medium">Alta demanda</span>
               </div>
             </div>
           </div>

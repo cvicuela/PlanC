@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useState, Suspense } from 'react';
+import { useState, Suspense, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Zap, Home, LogOut, Menu, X } from 'lucide-react';
 import {
@@ -90,9 +90,22 @@ function UserMenu() {
 
 function Header() {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  // Close menu when clicking outside
+  useEffect(() => {
+    if (!mobileOpen) return;
+    function handleClickOutside(e: MouseEvent) {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        setMobileOpen(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [mobileOpen]);
 
   return (
-    <header className="border-b border-gray-100 bg-white/90 backdrop-blur-sm sticky top-0 z-50">
+    <header ref={menuRef} className="border-b border-gray-100 bg-white/90 backdrop-blur-sm sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2 flex-shrink-0">
@@ -122,42 +135,49 @@ function Header() {
           </Suspense>
         </div>
 
-        {/* Mobile toggle */}
+        {/* Mobile toggle — visible only < 768px, aligned right */}
         <button
-          className="md:hidden p-2 text-gray-600 hover:text-gray-900"
+          className="md:hidden p-2 text-gray-600 hover:text-gray-900 transition-colors"
           onClick={() => setMobileOpen(!mobileOpen)}
-          aria-label="Menú"
+          aria-label={mobileOpen ? 'Cerrar menú' : 'Abrir menú'}
+          aria-expanded={mobileOpen}
         >
           {mobileOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
         </button>
       </div>
 
-      {/* Mobile menu */}
-      {mobileOpen && (
-        <div className="md:hidden border-t border-gray-100 bg-white px-4 py-4 space-y-3">
+      {/* Mobile menu — slide-down animation via CSS max-height transition */}
+      <div
+        className={[
+          'md:hidden overflow-hidden transition-all duration-300 ease-in-out',
+          mobileOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0',
+        ].join(' ')}
+        aria-hidden={!mobileOpen}
+      >
+        <div className="border-t border-gray-100 bg-white px-4 py-4 space-y-1">
           {navLinks.map((link) => (
             <Link
               key={link.href}
               href={link.href}
-              className="block py-2 text-sm font-medium text-gray-700 hover:text-[#7C3AED]"
+              className="block py-2.5 px-2 text-sm font-medium text-gray-700 hover:text-[#7C3AED] rounded-lg hover:bg-purple-50 transition-colors"
               onClick={() => setMobileOpen(false)}
             >
               {link.label}
             </Link>
           ))}
-          <div className="flex flex-col gap-2 pt-2 border-t border-gray-100">
+          <div className="flex flex-col gap-2 pt-3 border-t border-gray-100">
             <Button asChild variant="outline" className="w-full border-[#7C3AED] text-[#7C3AED]">
-              <Link href="/sign-up">Soy Suplidor</Link>
+              <Link href="/sign-up" onClick={() => setMobileOpen(false)}>Soy Suplidor</Link>
             </Button>
             <Button
               asChild
               className="w-full text-white border-0 bg-gradient-to-r from-[#7C3AED] to-[#F97316]"
             >
-              <Link href="/sign-up">Empieza Gratis</Link>
+              <Link href="/sign-up" onClick={() => setMobileOpen(false)}>Empieza Gratis</Link>
             </Button>
           </div>
         </div>
-      )}
+      </div>
     </header>
   );
 }
