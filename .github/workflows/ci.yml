@@ -32,6 +32,14 @@ jobs:
         run: npm run lint --if-present
 
       - name: Build
+        env:
+          STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY || '' }}
+          STRIPE_WEBHOOK_SECRET: ${{ secrets.STRIPE_WEBHOOK_SECRET || '' }}
+          POSTGRES_URL: ${{ secrets.POSTGRES_URL || '' }}
+          AUTH_SECRET: ${{ secrets.AUTH_SECRET || 'ci-placeholder-secret' }}
+          BASE_URL: ${{ secrets.BASE_URL || 'http://localhost:3000' }}
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL || '' }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY || '' }}
         run: npm run build
 
   build-app:
